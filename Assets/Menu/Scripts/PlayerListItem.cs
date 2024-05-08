@@ -7,13 +7,13 @@ using TMPro;
 
 public class PlayerListItem : MonoBehaviourPunCallbacks {
   [SerializeField] TMP_Text text;
-  Player player;
-  public void SetUp(Player _player) {
+  Photon.Realtime.Player player;
+  public void SetUp(Photon.Realtime.Player _player) {
     player = _player;
     text.text = _player.NickName;
   }
 
-  public override void OnPlayerLeftRoom(Player otherPlayer) {
+  public  override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer) {
     if (player == otherPlayer) {
       Destroy(gameObject);
     }

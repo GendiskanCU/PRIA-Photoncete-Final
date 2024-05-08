@@ -71,10 +71,9 @@ public class Launcher : MonoBehaviourPunCallbacks {
   }
 
   public override void OnJoinedRoom() {
-    
     MenuManager.Instance.OpenMenu("room");
     roomNameText.text = PhotonNetwork.CurrentRoom.Name;
-    Player[] players = PhotonNetwork.PlayerList;
+    Photon.Realtime.Player[] players = PhotonNetwork.PlayerList;
     foreach (Transform trans in playerListContent) {
       Destroy(trans.gameObject);
     }
@@ -85,7 +84,7 @@ public class Launcher : MonoBehaviourPunCallbacks {
     startGameButton.SetActive(PhotonNetwork.IsMasterClient);
   }
 
-  public override void OnMasterClientSwitched(Player newMasterClient) {
+  public override void OnMasterClientSwitched(Photon.Realtime.Player newMasterClient) {
     startGameButton.SetActive(PhotonNetwork.IsMasterClient);
   }
 
@@ -121,7 +120,7 @@ public class Launcher : MonoBehaviourPunCallbacks {
     MenuManager.Instance.OpenMenu("error");
   }
 
-  public override void OnPlayerEnteredRoom(Player newPlayer) {
+  public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer) {
     Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(newPlayer);
   }
 
