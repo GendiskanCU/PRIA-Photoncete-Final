@@ -106,6 +106,12 @@ public class no_multiPlayer_Player : MonoBehaviour
                 Invoke("AllowNewShot", timeUntilNewShoot);                
             }
 
+            //Buscar la fruta
+            if(Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                FruitSearch();
+            }
+
             //Animación
             anim.SetFloat("velocityX", Mathf.Abs(rig.velocity.x));
             anim.SetFloat("velocityY", rig.velocity.y);
@@ -147,5 +153,43 @@ public class no_multiPlayer_Player : MonoBehaviour
     private void AllowNewShot()
     {
         canShot = true;
+    }
+
+
+    //Método que busca e indica la posición de la fruta con respecto al personaje
+    private void FruitSearch()
+    {
+        GameObject fruit = GameObject.Find("no_multiPlayer_Fruit(Clone)");
+
+        if (fruit != null)
+        {
+
+            float deltaX = fruit.transform.position.x - transform.position.x;
+            float deltaY = fruit.transform.position.y - transform.position.y;
+
+            Debug.Log(deltaY);
+
+            if (deltaX > 0.2f)
+            {
+                Debug.Log("La fruta está hacia tu derecha");
+            }
+            else if (deltaX < -0.2f)
+            {
+                Debug.Log("La fruta está hacia tu izquierda");
+            }
+
+            if (deltaY > 0.5f)
+            {
+                Debug.Log("La fruta está hacia arriba");
+            }
+            else if (deltaY < -0.5f)
+            {
+                Debug.Log("La fruta está hacia abajo");
+            }
+        }
+        else
+        {
+            Debug.Log("Todavía no hay ninguna fruta en la escena");
+        }
     }
 }
