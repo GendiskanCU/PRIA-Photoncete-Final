@@ -13,6 +13,9 @@ public class no_multiPlayer_Player : MonoBehaviour
 
     //Para controlar las animaciones del personaje
     private Animator anim;
+    
+    //Para controlar los sonidos que emite el personaje
+    private AudioSource _audioSource;
 
     //Para controlar el giro del personaje
     private SpriteRenderer spriteRenderer;
@@ -22,6 +25,9 @@ public class no_multiPlayer_Player : MonoBehaviour
 
     //Para controlar cuándo puede disparar el personaje
     private bool canShot;
+    
+    //Para controlar cuándo puede activar una nueva búsqueda de la fruta
+    private bool canSearch;
 
     //Punto de disparo
     private GameObject shotPoint;
@@ -32,7 +38,15 @@ public class no_multiPlayer_Player : MonoBehaviour
     //Tiempo de espera entre disparos
     [SerializeField] private float timeUntilNewShoot = 0.5f;
 
+    //Proyectil
     [SerializeField] private GameObject shurikenPrefab;
+    
+    //Sonidos
+    [SerializeField] private AudioClip soundUp;
+    [SerializeField] private AudioClip soundDown;
+    [SerializeField] private AudioClip soundLeft;
+    [SerializeField] private AudioClip soundRight;
+    [SerializeField] private AudioClip soundNoFruit;
 
     // Start is called before the first frame update
     void Start()
@@ -40,6 +54,7 @@ public class no_multiPlayer_Player : MonoBehaviour
         
             rig = GetComponent<Rigidbody2D>();
             anim = GetComponent<Animator>();
+            _audioSource = GetComponent<AudioSource>();
             spriteRenderer = GetComponent<SpriteRenderer>();
 
             shotPoint = transform.GetChild(0).gameObject;
@@ -55,6 +70,9 @@ public class no_multiPlayer_Player : MonoBehaviour
 
         //Permite el disparo
         canShot = true;
+        
+        //Permite la búsqueda
+        canSearch = true;
     }
 
     // Update is called once per frame
@@ -107,9 +125,10 @@ public class no_multiPlayer_Player : MonoBehaviour
             }
 
             //Buscar la fruta
-            if(Input.GetKeyDown(KeyCode.LeftShift))
+            if(Input.GetKeyDown(KeyCode.LeftShift) && canSearch)
             {
-                FruitSearch();
+                canSearch = false;
+                StartCoroutine("FruitSearch");
             }
 
             //Animación
@@ -157,7 +176,7 @@ public class no_multiPlayer_Player : MonoBehaviour
 
 
     //Método que busca e indica la posición de la fruta con respecto al personaje
-    private void FruitSearch()
+    private IEnumerator FruitSearch()
     {
         GameObject fruit = GameObject.Find("no_multiPlayer_Fruit(Clone)");
 
@@ -172,24 +191,34 @@ public class no_multiPlayer_Player : MonoBehaviour
             if (deltaX > 0.2f)
             {
                 Debug.Log("La fruta está hacia tu derecha");
+                _audioSource.PlayOneShot(soundRight);
             }
             else if (deltaX < -0.2f)
             {
                 Debug.Log("La fruta está hacia tu izquierda");
+                _audioSource.PlayOneShot(soundLeft);
             }
 
+            yield return new WaitForSeconds(1f);
+            
             if (deltaY > 0.5f)
             {
                 Debug.Log("La fruta está hacia arriba");
+                _audioSource.PlayOneShot(soundUp);
             }
             else if (deltaY < -0.5f)
             {
                 Debug.Log("La fruta está hacia abajo");
+                _audioSource.PlayOneShot(soundDown);
             }
         }
         else
         {
             Debug.Log("Todavía no hay ninguna fruta en la escena");
+            _audioSource.PlayOneShot(soundNoFruit);
         }
+
+        yield return new WaitForSeconds(0.5f);
+        canSearch = true;
     }
 }
