@@ -64,7 +64,7 @@ public class Player : MonoBehaviourPunCallbacks
         puntuacionJugador1 = GameObject.Find("PuntosJugador1").GetComponent<TMP_Text>();
         puntuacionJugador2 = GameObject.Find("PuntosJugador2").GetComponent<TMP_Text>();
         //Llama al método que actualiza la puntuación en los cuadros de texto
-        ActualizaTextoPuntuacion();
+        //ActualizaTextoPuntuacion();
 
 
         //Permite el salto
@@ -184,14 +184,14 @@ public class Player : MonoBehaviourPunCallbacks
             switch (playerNumber)
             {
                 case 1: //Si es el jugador 1
-                    textoPuntuacion = "Jugador 1\n" + puntos.ToString() + " puntos";
+                    textoPuntuacion = GameManager.instance.NameJug1 +  "\n" + puntos.ToString() + " puntos";
                     puntuacionJugador1.text = textoPuntuacion;//Actualizo el texto en local
                     //Y luego actualizo el texto en red para que cambie también en el otro jugador (usando RPC)
                     photonView.RPC(nameof(CambiartextoPuntuacionRed), RpcTarget.AllBuffered, 1, textoPuntuacion);
                     break;
 
                 case 2: //Si es el jugador 2
-                    textoPuntuacion = "Jugador 2\n" + puntos.ToString() + " puntos";
+                    textoPuntuacion = GameManager.instance.NameJug2 + "\n" + puntos.ToString() + " puntos";
                     puntuacionJugador2.text = textoPuntuacion;//Actualizo el texto en local
                     //Y luego actualizo el texto en red para que cambie también en el otro jugador (usando RPC)
                     photonView.RPC(nameof(CambiartextoPuntuacionRed), RpcTarget.AllBuffered, 2, textoPuntuacion);

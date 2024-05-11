@@ -1,14 +1,34 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 using Photon.Pun;
+using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
     //Array con los posibles puntos de spwan de las frutas
     public GameObject [] fruits;
 
+
+    private string nameJug1, nameJug2;
+
+    public string NameJug1 => nameJug1;
+    public string NameJug2 => nameJug2;
+
+    public static GameManager instance;
+
+
+    private void Awake()
+    {
+        instance = this;
+        
+        //Guarda el nombre de los jugadores
+        Dictionary<int, Photon.Realtime.Player> playerList = PhotonNetwork.CurrentRoom.Players;
+        nameJug1 = playerList[1].NickName;
+        nameJug2 = playerList[2].NickName;
+    }
 
     // Start is called before the first frame update
     void Start()
