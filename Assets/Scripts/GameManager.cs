@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 using Photon.Pun;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
@@ -11,11 +13,19 @@ public class GameManager : MonoBehaviour
     //Array con los posibles puntos de spwan de las frutas
     public GameObject [] fruits;
 
+    //Panel de fin del juego
+    [SerializeField] private GameObject panelEndGame;
+    [SerializeField] private TMP_Text textEndGame;
+
+    [SerializeField] private int _scoreForVictory = 2;
+
 
     private string nameJug1, nameJug2;
 
     public string NameJug1 => nameJug1;
     public string NameJug2 => nameJug2;
+
+    public int ScoreForVictory => _scoreForVictory;
 
     public static GameManager instance;
 
@@ -62,6 +72,20 @@ public class GameManager : MonoBehaviour
             PhotonNetwork.Instantiate("Fruit", fruits[spawnPointFruit].transform.position, Quaternion.identity);
         }
         
+    }
+
+    
+    public void EndGame(string WinningPlayer)
+    {
+        //Muestra el panel de fin del juego, informando del jugador que ha vencido
+        textEndGame.text = "¡¡¡" + WinningPlayer + " ha vencido!!!";
+        Time.timeScale = 0;
+        panelEndGame.SetActive(true);
+    }
+
+    public void BtnExitGame()
+    {
+        Application.Quit();
     }
    
 }

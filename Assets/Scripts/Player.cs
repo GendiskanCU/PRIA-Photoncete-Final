@@ -164,10 +164,12 @@ public class Player : MonoBehaviourPunCallbacks
             Debug.Log("Puntos jugador " + gameObject.name + ": " + puntos);
             //Se actualiza el cuadro de texto con la nueva puntuación
             ActualizaTextoPuntuacion();
-
-            //Se indica al GameManager que vuelva a instanciar una nueva fruta
+            
+            
+            
+            //El juego continúa. Se indica al GameManager que vuelva a instanciar una nueva fruta
             GameObject.Find("SceneManager").GetComponent<GameManager>().NewFruit();
-
+            
         }
     }
 
@@ -179,23 +181,35 @@ public class Player : MonoBehaviourPunCallbacks
             //Asigna a cada jugador el cuadro de texto del canvas que le corresponda para mostrar su puntuación
             //Utilizo el identificador ActorNumber para saber qué jugador soy
             int playerNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+            string namePlayer ="";
 
             //Utiliza el cuadro de texto adecuado según quién sea el jugador
             switch (playerNumber)
             {
                 case 1: //Si es el jugador 1
-                    textoPuntuacion = GameManager.instance.NameJug1 +  "\n" + puntos.ToString() + " puntos";
+                    namePlayer = GameManager.instance.NameJug1;
+                    textoPuntuacion = namePlayer +  "\n" + puntos.ToString() + " puntos";
                     puntuacionJugador1.text = textoPuntuacion;//Actualizo el texto en local
                     //Y luego actualizo el texto en red para que cambie también en el otro jugador (usando RPC)
                     photonView.RPC(nameof(CambiartextoPuntuacionRed), RpcTarget.AllBuffered, 1, textoPuntuacion);
                     break;
 
                 case 2: //Si es el jugador 2
-                    textoPuntuacion = GameManager.instance.NameJug2 + "\n" + puntos.ToString() + " puntos";
+                    namePlayer = GameManager.instance.NameJug2;
+                    textoPuntuacion = namePlayer + "\n" + puntos.ToString() + " puntos";
                     puntuacionJugador2.text = textoPuntuacion;//Actualizo el texto en local
                     //Y luego actualizo el texto en red para que cambie también en el otro jugador (usando RPC)
                     photonView.RPC(nameof(CambiartextoPuntuacionRed), RpcTarget.AllBuffered, 2, textoPuntuacion);
                     break;
+            }
+            
+            //Si el jugador es el primero en lograr la puntuación para ganar
+            if (puntos >= GameManager.instance.ScoreForVictory)
+            {
+                //El juego finalizará con victoria del jugador. Se muestra el final de juego en local y en red
+                string winningPlayer = namePlayer;
+                GameManager.instance.EndGame(winningPlayer);
+                photonView.RPC(nameof(FinalizeGameOtherPlayer), RpcTarget.AllBuffered, winningPlayer);
             }
         }
         
@@ -213,6 +227,12 @@ public class Player : MonoBehaviourPunCallbacks
         {
             puntuacionJugador2.text = texto;
         }
+    }
+
+    [PunRPC]
+    private void FinalizeGameOtherPlayer(string winningPlayer)
+    {
+        GameManager.instance.EndGame(winningPlayer);
     }
 
 }
