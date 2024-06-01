@@ -25,8 +25,18 @@ public class Launcher : MonoBehaviourPunCallbacks {
   }
 
   private void Start() {
-    Debug.Log("¡Conectando al máster!");
-    PhotonNetwork.ConnectUsingSettings();
+    if (PhotonNetwork.IsConnected)
+    {
+      //Si el jugador está conectado al servidor es porque venimos de la escena del juego, por lo que
+      //cargamos el panel de la sala
+      ConfigureRoom();
+    }
+    else
+    {
+      //Si el jugador no está conectado realiza el proceso de conexión desde el principio
+      Debug.Log("¡Conectando al máster!");
+      PhotonNetwork.ConnectUsingSettings();
+    }
   }
 
   public override void OnConnectedToMaster() {
@@ -70,7 +80,13 @@ public class Launcher : MonoBehaviourPunCallbacks {
     }
   }
 
-  public override void OnJoinedRoom() {
+  public override void OnJoinedRoom()
+  {
+    ConfigureRoom();
+  }
+
+  private void ConfigureRoom()
+  {
     MenuManager.Instance.OpenMenu("room");
     roomNameText.text = PhotonNetwork.CurrentRoom.Name;
     Photon.Realtime.Player[] players = PhotonNetwork.PlayerList;

@@ -85,7 +85,9 @@ public class GameManager : MonoBehaviour
 
     public void BtnExitGame()
     {
-        Application.Quit();
+        //Restaura la velocidad normal del juego y regresa al menú
+        Time.timeScale = 1;
+        PhotonNetwork.LoadLevel(0);
     }
    
 }

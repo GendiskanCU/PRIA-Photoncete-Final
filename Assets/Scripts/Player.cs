@@ -41,6 +41,19 @@ public class Player : MonoBehaviourPunCallbacks
 
     //Tiempo de espera entre disparos
     [SerializeField] private float timeUntilNewShoot = 0.5f;
+    
+    
+    //Sonidos que emite el jugador
+    [SerializeField] private AudioClip shootingUp;
+    [SerializeField] private AudioClip eating;
+    [SerializeField] private AudioClip goingUp;
+    [SerializeField] private AudioClip goingDown;
+
+    //Control de los sonidos que reproduce el personaje
+    private AudioSource _audioSource;
+    
+    //Para controlar si se está reproduciend ya algún sonido de movimiento del personaje
+    private bool isMovingAudioPlaying = false;
 
     // Start is called before the first frame update
     void Start()
@@ -50,6 +63,7 @@ public class Player : MonoBehaviourPunCallbacks
             rig = GetComponent<Rigidbody2D>();
             anim = GetComponent<Animator>();
             spriteRenderer = GetComponent<SpriteRenderer>();
+            _audioSource = GetComponent<AudioSource>();
 
             shotPoint = transform.GetChild(0).gameObject;
             shotPoint.transform.localPosition = initialPositionshotPoint;
@@ -121,11 +135,38 @@ public class Player : MonoBehaviourPunCallbacks
                 canShot = false;
                 //Permite disparar de nuevo cuando pase el tiempo especificado
                 Invoke("AllowNewShot", timeUntilNewShoot);
+                
+                //Reproduce el sonido
+                _audioSource.clip = shootingUp;
+                _audioSource.Play();
+                photonView.RPC(nameof(PlaySoundShooting), RpcTarget.Others);
             }
 
             //Animación
             anim.SetFloat("velocityX", Mathf.Abs(rig.velocity.x));
             anim.SetFloat("velocityY", rig.velocity.y);
+            
+            //Sonido
+            if (rig.velocity.y > 0.02)
+            {
+                //SFX_Controller.instance.PlayAudio(SFX_Controller.Actions.Subiendo);
+                //Reproduce el sonido
+                if (!isMovingAudioPlaying)
+                {
+                    _audioSource.clip = goingUp;
+                    StartCoroutine(PlaysMovingUpAudioControlledly());
+                }
+            }
+            if (rig.velocity.y < -0.02)
+            {
+                //SFX_Controller.instance.PlayAudio(SFX_Controller.Actions.Bajando);
+                //Reproduce el sonido
+                if (!isMovingAudioPlaying)
+                {
+                    _audioSource.clip = goingDown;
+                    StartCoroutine(PlaysMovingDownAudioControlledly());
+                }
+            }
         }
     }
 
@@ -203,6 +244,11 @@ public class Player : MonoBehaviourPunCallbacks
                     break;
             }
             
+            //Reproduce el sonido
+            _audioSource.clip = eating;
+            _audioSource.Play();
+            photonView.RPC(nameof(PlaySoundEating), RpcTarget.Others);
+
             //Si el jugador es el primero en lograr la puntuación para ganar
             if (puntos >= GameManager.instance.ScoreForVictory)
             {
@@ -213,6 +259,27 @@ public class Player : MonoBehaviourPunCallbacks
             }
         }
         
+    }
+    
+    
+    IEnumerator PlaysMovingUpAudioControlledly()
+    {
+        isMovingAudioPlaying = true;
+        _audioSource.Play();
+        photonView.RPC(nameof(StartSoundMovingUp), RpcTarget.Others);
+        yield return new WaitForSeconds(0.85f);
+        isMovingAudioPlaying = false;
+        photonView.RPC(nameof(StopSoundMoving), RpcTarget.Others);
+    }
+    
+    IEnumerator PlaysMovingDownAudioControlledly()
+    {
+        isMovingAudioPlaying = true;
+        _audioSource.Play();
+        photonView.RPC(nameof(StartSoundMovingDown), RpcTarget.Others);
+        yield return new WaitForSeconds(0.85f);
+        isMovingAudioPlaying = false;
+        photonView.RPC(nameof(StopSoundMoving), RpcTarget.Others);
     }
 
     [PunRPC]
@@ -233,6 +300,47 @@ public class Player : MonoBehaviourPunCallbacks
     private void FinalizeGameOtherPlayer(string winningPlayer)
     {
         GameManager.instance.EndGame(winningPlayer);
+    }
+
+
+    [PunRPC]
+    private void PlaySoundShooting()
+    {
+        AudioSource audio = GetComponent<AudioSource>();
+        audio.clip = shootingUp;
+        audio.Play();
+    }
+    
+    [PunRPC]
+    private void PlaySoundEating()
+    {
+        AudioSource audio = GetComponent<AudioSource>();
+        audio.clip = eating;
+        audio.Play();
+    }
+    
+    [PunRPC]
+    private void StartSoundMovingUp()
+    {
+        isMovingAudioPlaying = true;
+        AudioSource audio = GetComponent<AudioSource>();
+        audio.clip = goingUp;
+        audio.Play();
+    }
+    
+    [PunRPC]
+    private void StartSoundMovingDown()
+    {
+        isMovingAudioPlaying = true;
+        AudioSource audio = GetComponent<AudioSource>();
+        audio.clip = goingDown;
+        audio.Play();
+    }
+    
+    [PunRPC]
+    private void StopSoundMoving()
+    {
+        isMovingAudioPlaying = false;
     }
 
 }
