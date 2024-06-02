@@ -240,10 +240,10 @@ MonoBehaviour:
   initialPositionshotPoint: {x: 0.51, y: -0.61, z: 0}
   flipPositionshotPoint: {x: -0.62, y: -0.61, z: 0}
   timeUntilNewShoot: 0.5
-  shootingUp: {fileID: 8300000, guid: 65bc2e435414ddf4abb59075ffca9bd7, type: 3}
-  eating: {fileID: 8300000, guid: c01b91603da648447bf545b164567692, type: 3}
-  goingUp: {fileID: 8300000, guid: 3e6a0a49fd6109644b8eff4c7d28a6b8, type: 3}
-  goingDown: {fileID: 8300000, guid: 872bdac48ac31c04db89bcf396f6f0df, type: 3}
+  shootingUp: {fileID: 8300000, guid: 8dc42c8339f274c4a8cd5ddca04a25cc, type: 3}
+  eating: {fileID: 8300000, guid: f6cf90bb1ca84ff46a93410833661811, type: 3}
+  goingUp: {fileID: 8300000, guid: 5e6ab572ab0b30b4e9e93375032274eb, type: 3}
+  goingDown: {fileID: 8300000, guid: dc08162d62949a74d8297a0ad25f286b, type: 3}
 --- !u!114 &8368263400994419739
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -318,7 +318,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 65bc2e435414ddf4abb59075ffca9bd7, type: 3}
+  m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 65bc2e435414ddf4abb59075ffca9bd7, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.1

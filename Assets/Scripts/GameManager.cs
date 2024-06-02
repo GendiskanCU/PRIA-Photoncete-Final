@@ -43,6 +43,10 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //Bloquea el cursor del ratón
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        
         //La instanciación de cada personaje se hace con Photon        
         if(PhotonNetwork.IsMasterClient)//Si es el jugador 1, el master
         {
@@ -74,12 +78,14 @@ public class GameManager : MonoBehaviour
         
     }
 
-    
+    //Muestra el panel de fin del juego, informando del jugador que ha vencido
     public void EndGame(string WinningPlayer)
     {
-        //Muestra el panel de fin del juego, informando del jugador que ha vencido
         textEndGame.text = "¡¡¡" + WinningPlayer + " ha vencido!!!";
         Time.timeScale = 0;
+        //Desbloquea el cursor del ratón
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
         panelEndGame.SetActive(true);
     }
 
