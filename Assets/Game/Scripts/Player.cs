@@ -44,15 +44,15 @@ public class Player : MonoBehaviourPunCallbacks
     
     
     //Sonidos que emite el jugador
-    [SerializeField] private AudioClip shootingUp;
-    [SerializeField] private AudioClip eating;
-    [SerializeField] private AudioClip goingUp;
-    [SerializeField] private AudioClip goingDown;
+    [SerializeField] private AudioClip shootingUp; //Al disparar
+    [SerializeField] private AudioClip eating; //Al comer una fruta
+    [SerializeField] private AudioClip goingUp; //Al moverse hacia arriba -saltar-
+    [SerializeField] private AudioClip goingDown; //Al moverse hacia abajo
 
     //Control de los sonidos que reproduce el personaje
     private AudioSource _audioSource;
     
-    //Para controlar si se está reproduciend ya algún sonido de movimiento del personaje
+    //Para controlar si se está reproduciendo ya algún sonido de movimiento del personaje (arriba o abajo)
     private bool isMovingAudioPlaying = false;
 
     // Start is called before the first frame update
@@ -77,8 +77,6 @@ public class Player : MonoBehaviourPunCallbacks
         //Capturamos los dos TextMeshPro que mostrarán las puntuaciones
         puntuacionJugador1 = GameObject.Find("PuntosJugador1").GetComponent<TMP_Text>();
         puntuacionJugador2 = GameObject.Find("PuntosJugador2").GetComponent<TMP_Text>();
-        //Llama al método que actualiza la puntuación en los cuadros de texto
-        //ActualizaTextoPuntuacion();
 
 
         //Permite el salto
@@ -136,9 +134,10 @@ public class Player : MonoBehaviourPunCallbacks
                 //Permite disparar de nuevo cuando pase el tiempo especificado
                 Invoke("AllowNewShot", timeUntilNewShoot);
                 
-                //Reproduce el sonido
+                //Reproduce el sonido del disparo para que lo escuche el propio jugador
                 _audioSource.clip = shootingUp;
                 _audioSource.Play();
+                //Reproduce el sonido del disparo para que también lo escuchen el resto de jugadores
                 photonView.RPC(nameof(PlaySoundShooting), RpcTarget.Others);
             }
 
@@ -146,35 +145,28 @@ public class Player : MonoBehaviourPunCallbacks
             anim.SetFloat("velocityX", Mathf.Abs(rig.velocity.x));
             anim.SetFloat("velocityY", rig.velocity.y);
             
-            //Sonido
+            //Sonido del movimiento hacia arriba o hacia abajo
             if (rig.velocity.y > 0.02)
             {
-                //SFX_Controller.instance.PlayAudio(SFX_Controller.Actions.Subiendo);
-                //Reproduce el sonido
                 if (!isMovingAudioPlaying)
                 {
+                    //Asigna el sonido a reproducir
                     _audioSource.clip = goingUp;
+                    //Invoca a la corutina que reproducirá el sonido asegurando que finalice antes de reproducir otro
                     StartCoroutine(PlaysMovingUpAudioControlledly());
                 }
             }
             if (rig.velocity.y < -0.02)
             {
-                //SFX_Controller.instance.PlayAudio(SFX_Controller.Actions.Bajando);
-                //Reproduce el sonido
                 if (!isMovingAudioPlaying)
                 {
+                    //Asigna el sonido a reproducir
                     _audioSource.clip = goingDown;
+                    //Invoca a la corutina que reproducirá el sonido asegurando que finalice antes de reproducir otro
                     StartCoroutine(PlaysMovingDownAudioControlledly());
                 }
             }
         }
-    }
-
-    //Método que rota el sprite para uso con RPC
-    [PunRPC]
-    public void RotateSprite(bool rotate)
-    {
-        GetComponent<SpriteRenderer>().flipX = rotate;
     }
 
 
@@ -244,9 +236,10 @@ public class Player : MonoBehaviourPunCallbacks
                     break;
             }
             
-            //Reproduce el sonido
+            //Reproduce el sonido para que lo escuche el propio jugador
             _audioSource.clip = eating;
             _audioSource.Play();
+            //Reproduce el sonido para que también lo escuchen el resto de jugadores
             photonView.RPC(nameof(PlaySoundEating), RpcTarget.Others);
 
             //Si el jugador es el primero en lograr la puntuación para ganar
@@ -262,26 +255,52 @@ public class Player : MonoBehaviourPunCallbacks
     }
     
     
+    //Corutina que reproduce el sonido de movimiento hacia arriba, asegurando que finaliza de reproducirse
+    //antes de que sea posible volver a reproducir otro, con el fin de evitar que se solapen.
     IEnumerator PlaysMovingUpAudioControlledly()
     {
         isMovingAudioPlaying = true;
+        //Reproduce el sonido para que lo escuche el propio jugador
         _audioSource.Play();
+        //Reproduce el sonido para que también lo escuchen el resto de jugadores
         photonView.RPC(nameof(StartSoundMovingUp), RpcTarget.Others);
         yield return new WaitForSeconds(0.85f);
+        //Indica que el sonido terminó de reproducirse y ya es posible volver a reproducir otro
         isMovingAudioPlaying = false;
+        //Indica a los demás jugadores que el sonido terminó de reproducirse y ya es posible volver a reproducir otro
         photonView.RPC(nameof(StopSoundMoving), RpcTarget.Others);
     }
     
+    //Corutina que reproduce el sonido de movimiento hacia abajo, asegurando que finaliza de reproducirse
+    //antes de que sea posible volver a reproducir otro, con el fin de evitar que se solapen.
     IEnumerator PlaysMovingDownAudioControlledly()
     {
         isMovingAudioPlaying = true;
+        //Reproduce el sonido para que lo escuche el propio jugador
         _audioSource.Play();
+        //Reproduce el sonido para que también lo escuchen el resto de jugadores
         photonView.RPC(nameof(StartSoundMovingDown), RpcTarget.Others);
         yield return new WaitForSeconds(0.85f);
+        //Indica que el sonido terminó de reproducirse y ya es posible volver a reproducir otro
         isMovingAudioPlaying = false;
+        //Indica a los demás jugadores que el sonido terminó de reproducirse y ya es posible volver a reproducir otro
         photonView.RPC(nameof(StopSoundMoving), RpcTarget.Others);
     }
 
+    
+    
+    // =================================================================
+    // MÉTODOS RPC para sincronizaciones multijugador
+    // =================================================================
+
+    //Método que rota el sprite para uso con RPC
+    [PunRPC]
+    public void RotateSprite(bool rotate)
+    {
+        GetComponent<SpriteRenderer>().flipX = rotate;
+    }
+    
+    
     [PunRPC]
     private void CambiartextoPuntuacionRed(int jugador, string texto)
     {

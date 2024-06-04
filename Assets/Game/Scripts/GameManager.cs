@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject panelEndGame;
     [SerializeField] private TMP_Text textEndGame;
 
+    //Puntuación necesaria para alcanzar la victoria
     [SerializeField] private int _scoreForVictory = 2;
 
 
@@ -67,6 +68,7 @@ public class GameManager : MonoBehaviour
         //Espera 5 segundos y llama al método que instancia una fruta          
         Invoke("InstantiateFruit", 5.0f);
     }
+    //Método que instancia una fruta en uno de los spawnpoints elegidos aleatoriamente
     private void InstantiateFruit()
     {
         if(PhotonNetwork.IsMasterClient) //Hay que ponerlo para que solo instancie la fruta el jugador Master. Si no, cada jugador que hubiera instanciaría una
@@ -78,11 +80,11 @@ public class GameManager : MonoBehaviour
         
     }
 
-    //Muestra el panel de fin del juego, informando del jugador que ha vencido
+    //Método que muestra el panel de fin del juego, informando qué jugador ha vencido
     public void EndGame(string WinningPlayer)
     {
         textEndGame.text = "¡¡¡" + WinningPlayer + " ha vencido!!!";
-        Time.timeScale = 0;
+        Time.timeScale = 0; //Detiene el juego
         //Desbloquea el cursor del ratón
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;

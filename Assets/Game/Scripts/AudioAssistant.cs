@@ -5,7 +5,7 @@ using UnityEngine;
 public class AudioAssistant : MonoBehaviour
 {
     
-    //Sonidos
+    //Sonidos de posicionamiento de la fruta
     [SerializeField] private AudioClip soundUp;
     [SerializeField] private AudioClip soundDown;
     [SerializeField] private AudioClip soundLeft;
@@ -13,7 +13,7 @@ public class AudioAssistant : MonoBehaviour
     [SerializeField] private AudioClip soundNoFruit;
     
     
-    //Para controlar los sonidos que emite
+    //Para controlar los sonidos que se emiten
     private AudioSource _audioSource;
     
     //Permite la búsqueda de la fruta
@@ -47,7 +47,7 @@ public class AudioAssistant : MonoBehaviour
     {
         GameObject fruit = GameObject.FindWithTag("Fruit");
 
-        if (fruit != null)
+        if (fruit != null) //Si hay fruta en la escena
         {
 
             float deltaX = fruit.transform.position.x - player.transform.position.x;
@@ -85,7 +85,7 @@ public class AudioAssistant : MonoBehaviour
             _audioSource.PlayOneShot(soundNoFruit);
         }
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.5f); //Tiempo mínimo de espera hasta la próxima búsqueda
         canSearch = true;
     }
 }
