@@ -8,12 +8,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Menu/Menu.unity
     guid: 686d4a47c24a16e48bc760923c947601
-  - enabled: 0
-    path: Assets/Game/Game.unity
-    guid: 6e150aac8c7e7534aa913a77fe9be0ad
-  - enabled: 0
-    path: Assets/Test_Scenes/Cortinilla.unity
-    guid: e9abc4a299b426344a7022011071aedb
   - enabled: 1
     path: Assets/Game/GameScene.unity
     guid: d5debbfd4d241ca469be238b0bc57b90
